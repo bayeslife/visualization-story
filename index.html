@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>tests</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <script src="playback.js"></script>
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+  </head>
+
+  <body>
+
+    <button id="controls" disabled onclick="resume()">Continue</button>
+
+    <div id="chart">
+    </div>
+
+    <script>
+      var player = playback.player();
+
+      function Layout(selector) {
+        playback.Layout.call(this);
+        this.selector = selector;
+      }
+      Layout.prototype = new playback.Layout();
+      Layout.prototype.initialize = function () {
+          var self = this;
+          this.controls = d3.select("#controls")
+          this.svg = d3.select(this.selector).append("svg").attr("width","200").attr("height","200")
+          this.g = this.svg.append("g")
+          this.titleContainer = this.g.attr("transform", "translate(50,50)").style("color", "red");
+          this.titleContainer.append("text");
+        }
+      Layout.prototype.invalidate = function() {
+
+        this.titleContainer.selectAll("*").transition().duration(2000).style("opacity", "0").remove();
+        this.titleContainer.append("text").text(player.model().title).style("opacity", "0").transition().duration(2000).style("opacity", "1")
+        this.controls.attr("disabled",null);
+      }
+
+      player.layout(new Layout("#chart"));
+
+      function MyModel() {
+          playback.Model.call(this);
+      }
+
+      MyModel.prototype = new playback.Model();
+      MyModel.prototype.constructor = MyModel;
+
+      var mymodel = new MyModel();
+      player.model(mymodel);
+
+      player.frame("intro/", "Chapter1", function(frame) {
+        frame.after(0, function() {
+            frame.model().title = "Chapter1";
+            player.layout().invalidate();
+            player.pause()
+        })
+        .after(1000, function() {
+            player.next();
+        })
+
+    });
+
+    player.frame("chapter2", "Chapter2", function(frame) {
+      frame.after(0, function() {
+          console.log("Chapter2");
+          frame.model().title = "Chapter2";
+          player.layout().invalidate();
+          player.pause();
+      })
+      .after(1000, function() {
+          player.next();
+      })
+    })
+
+
+    player.frame("chapter3", "Chapter3", function(frame) {
+      frame.after(0, function() {
+          console.log("Chapter3");
+          frame.model().title = "Chapter3";
+          player.layout().invalidate();
+          player.pause();
+      })
+      .after(1000, function() {
+          frame.model().title = "";
+          player.layout().invalidate();
+          player.next();
+      })
+    })
+
+    player.play();
+
+    function dispatch(){
+      console.log("dispatch")
+      mymodel.dispatchEvent({type:"myevent"})
+    }
+    function resume(){
+      player.layout().controls.attr("disabled",true);
+      player.play();
+    }
+    function pause() {
+      player.pause();
+    }
+
+    </script>
+  </body>
+</html>
