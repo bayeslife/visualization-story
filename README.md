@@ -1,6 +1,6 @@
-# Story
+# Storyline
 
-This is a mechanism to have a visualization where the user interacts with a d3 model.
+This is a mechanism to have a visualization where the user interacts with a d3 model as a series of related frames each with any number of timed or event driven events.
 
 ## Run
 
